@@ -14,20 +14,23 @@ public class PlayerMovement : MonoBehaviour
      * 스크립트를 올바르게 작성해도 동작이 완벽하지 않습니다.
      * 해당 부분까지 완벽하게 구현이 끝나야 만점으로 인정합니다.
      */
-
+   
     [Header("회전 스피드")]
     public float turnSpeed = 20f;
 
     // 문제 1에서 사용해야 할 변수들
-    private Animator animator;
+    private Animator m_animator;
     private Rigidbody rb;
-    private Vector3 movement;
+    private Vector3 m_Movement;
     private Quaternion rotation = Quaternion.identity;
+    //private object movement;
 
     private void Start()
-    {        
+    {
         // 문제 1) 위에 주어진 animator, rb 변수를 이용해 Component를 받아오는 명령어를 작성하세요.
         // (Component당 5점, 합계 5*2=10점, 부분점수 있음)
+        m_animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
 
     }
 
@@ -35,33 +38,32 @@ public class PlayerMovement : MonoBehaviour
     {
         // 문제 2) Input.GetAxis를 사용하여 존 레몬이 움직일 수 있게 좌표를 입력하세요.
         // 0f 대신 정답을 채워넣으면 작동합니다. (각 변수당 5점, 총 10점)
-        float horizontal = 0f; // 이 변수와
-        float vertical = 0f; // 이 변수를 사용해야 합니다.
+        float horizontal = Input.GetAxis("Horizontal"); // 이 변수와
+        float vertical = Input.GetAxis("Vertical");// 이 변수를 사용해야 합니다.
         
         #region 건드리면 작동 안 됨
-        movement.Set(horizontal, 0f, vertical);
-        movement.Normalize();
+        m_Movement.Set(horizontal, 0f, vertical);
+        m_Movement.Normalize();
         #endregion
 
         // 문제 3) isWalking은 hasHorizontalInput과 hasVerticalInput중 하나만 입력되어도 true(참)가 되어야 합니다.
         // false를 지우고 제대로 된 명령줄을 완성해 주세요. (10점)
         bool hasHorizontalInput = !Mathf.Approximately(horizontal, 0f);
-        bool hasVerticalInput = !Mathf.Approximately(vertical, 0f);        
-
-        bool isWalking = false;
+        bool hasVerticalInput = !Mathf.Approximately(vertical, 0f);
+        bool isWalking = hasHorizontalInput || hasVerticalInput;
 
         // 문제 4) isWalking 변수를 Animator의 IsWalking 파라미터에 적용하세요. (10점)
-
+        bool ASDF = ("IsWalking", isWalking);
 
         // 문제 5) 원하는 방향으로 이동할 수 있는 Vector3값을 만드는 명령줄을 Vector3.zero를 지우고 완성해 주세요. (10점)
-        Vector3 desiredFoward = Vector3.zero;
+        Vector3 desiredFoward = (m_Movement,turnSpeed,deltatime);
         rotation = Quaternion.LookRotation(desiredFoward);
 
     }
 
     private void OnAnimatorMove()
     {
-        rb.MovePosition(rb.position + movement * animator.deltaPosition.magnitude);
+        rb.MovePosition(rb.position + m_Movement * m_animator.deltaPosition.magnitude);
         rb.MoveRotation(rotation);
     }
 }
